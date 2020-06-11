@@ -295,7 +295,7 @@ class botCisco():
     def conf_clave(self, update, context):
         self.tipo_auth = int(update.message.text)
         if self.tipo_auth == 1:
-            self.tipo_auth = auth_mode_enum.AuthModeEnum.OPEN
+            self.tipo_auth = AuthModeEnum.OPEN
             update.message.reply_text("Open")
             update.message.reply_text("Modo de Asignacion IP")
             update.message.reply_text("Digite una de las siguientes opciones")
@@ -308,40 +308,39 @@ class botCisco():
             """)
             return self.op_mode_assigmentip
         elif self.tipo_auth == 2:
-            self.tipo_auth = auth_mode_enum.AuthModeEnum.PSK
+            self.tipo_auth = AuthModeEnum.PSK
             update.message.reply_text("Psk")
             update.message.reply_text("Digite la clave para la red WIFI")
         elif self.tipo_auth == 3:
-            self.tipo_auth = auth_mode_enum.AuthModeEnum.OPENWITHRADIUS
+            self.tipo_auth = AuthModeEnum.OPENWITHRADIUS
             update.message.reply_text("Open with radius") ##Corregir-revisar servidor
             update.message.reply_text("Digite la direccion ip del servidor")
             return self.op_conf_serv
         elif self.tipo_auth == 4:
-            self.tipo_auth = auth_mode_enum.AuthModeEnum.ENUM_8021XMERAKI
+            self.tipo_auth = AuthModeEnum.ENUM_8021XMERAKI
             update.message.reply_text('8021x-meraki') ##Corregir-revisar servidor
             self.mode_encrip = "wpa-eap"
-            update.message.reply_text("Modo de Asignacion IP")
+            update.message.reply_text("RADIUS attribute specifying group policy name")
             update.message.reply_text("Digite una de las siguientes opciones")
             update.message.reply_text("""
-                1.'NAT mode'
-                2.'Bridge mode'
-                3.'Layer 3 roaming',
-                4.'Layer 3 roaming with a concentrator'
-                5.'VPN'
+            1.'Filter-Id'
+            2.'Reply-Message'
+            3.'Airespace-ACL-Name'
+            4.'Aruba-User-Role'
                 """)
-            return self.op_mode_assigmentip
+            return self.op_radius_attribute
         elif self.tipo_auth == 5:
-            self.tipo_auth = auth_mode_enum.AuthModeEnum.ENUM_8021XRADIUS
+            self.tipo_auth = AuthModeEnum.ENUM_8021XRADIUS
             update.message.reply_text('8021x-radius') ##Corregir-revisar servidor
             update.message.reply_text("Digite la direccion ip del servidor")
             return self.op_conf_serv
         elif self.tipo_auth == 6:
-            self.tipo_auth = auth_mode_enum.AuthModeEnum.IPSKWITHRADIUS
+            self.tipo_auth = 'ipsk-with-radius'
             update.message.reply_text('ipsk-with-radius') ##Corregir-revisar servidor
             update.message.reply_text("Digite la direccion ip del servidor")
             return self.op_conf_serv
         elif self.tipo_auth == 7:
-            self.tipo_auth = auth_mode_enum.AuthModeEnum.IPSKWITHOUTRADIUS
+            self.tipo_auth = "ipsk-without-radius"
             update.message.reply_text('ipsk-without-radius') ##Corregir-revisar servidor
             update.message.reply_text("Digite la direccion ip del servidor")
             return self.op_conf_serv
@@ -497,15 +496,14 @@ class botCisco():
         self.mode_assigmentip = int(update.message.text)
         if self.mode_assigmentip == 1:
             self.mode_assigmentip = 'NAT mode'
-            update.message.reply_text('NAT mode')
-            vlans = self.vlans_controller.get_network_vlans(self.networkid)
-            vlansText = 'VLAN ID'+'|'+'VLAN NAME'+'|'+'VLAN subnet'+'\n'
-            for x in vlans:
-                vlansText = vlansText + \
-                    format(x["id"])+'|'+format(x["name"]) + \
-                    '|'+format(x["subnet"])+'\n'
-            update.message.reply_text(vlansText)
-            update.message.reply_text("Digite el id de la VLAN a asignar")
+            update.message.reply_text("Bandas para la red Wifi")
+            update.message.reply_text("Digite una de las siguientes opciones")
+            update.message.reply_text("""
+            1.'Dual band operation'
+            2.'5 GHz band only'
+            3.'Dual band operation with Band Steering'
+            """)
+            return self.op_band_selection
         elif self.mode_assigmentip == 2:
             self.mode_assigmentip = 'Bridge mode'
             update.message.reply_text('Bridge mode')
@@ -515,7 +513,6 @@ class botCisco():
                 vlansText = vlansText + \
                     format(x["id"])+'|'+format(x["name"]) + \
                     '|'+format(x["subnet"])+'\n'
-
             update.message.reply_text(vlansText)
             update.message.reply_text("Digite el id de la VLAN a asignar")
         elif self.mode_assigmentip == 3:
@@ -528,7 +525,6 @@ class botCisco():
                 vlansText = vlansText + \
                     format(x["id"])+'|'+format(x["name"]) + \
                     '|'+format(x["subnet"])+'\n'
-
             update.message.reply_text(vlansText)
             update.message.reply_text("Digite el id de la VLAN a asignar")
         elif self.mode_assigmentip == 4:
@@ -540,21 +536,18 @@ class botCisco():
                 vlansText = vlansText + \
                     format(x["id"])+'|'+format(x["name"]) + \
                     '|'+format(x["subnet"])+'\n'
-
             update.message.reply_text(vlansText)
             update.message.reply_text("Digite el id de la VLAN a asignar")
         elif self.mode_assigmentip == 5:
             self.mode_assigmentip = 'VPN'
-            update.message.reply_text('VPN')
-            vlans = self.vlans_controller.get_network_vlans(self.networkid)
-            vlansText = 'VLAN ID'+'|'+'VLAN NAME'+'|'+'VLAN subnet'+'\n'
-            for x in vlans:
-                vlansText = vlansText + \
-                    format(x["id"])+'|'+format(x["name"]) + \
-                    '|'+format(x["subnet"])+'\n'
-
-            update.message.reply_text(vlansText)
-            update.message.reply_text("Digite el id de la VLAN a asignar")
+            update.message.reply_text("Bandas para la red Wifi")
+            update.message.reply_text("Digite una de las siguientes opciones")
+            update.message.reply_text("""
+            1.'Dual band operation'
+            2.'5 GHz band only'
+            3.'Dual band operation with Band Steering'
+            """)
+            return self.op_band_selection
         else:
             update.message.reply_text("Digite una opcion valida")
             return self.op_mode_assigmentip
@@ -615,26 +608,35 @@ class botCisco():
             self.update_network_ssid['authMode'] = self.tipo_auth
             self.update_network_ssid['encryptionMode'] = self.mode_encrip
         else:
-            radius_server={}
-            radius_server["host"] = self.serv_radius
-            radius_server["port"] = self.port_radius
-            radius_server["secret"] = "null"
-            self.update_network_ssid['authMode'] = self.tipo_auth
-            self.update_network_ssid['encryptionMode'] = "wpa"
-            self.update_network_ssid['wpaEncryptionMode'] = "WPA2 only"
-            self.update_network_ssid['radiusServers'] = [radius_server]
-            self.update_network_ssid['radiusEnabled'] = True
-            self.update_network_ssid['radiusAttributeForGroupPolicies'] = "Filter-Id"
-        self.update_network_ssid['ipAssignmentMode'] = self.mode_assigmentip
-        self.update_network_ssid['useVlanTagging'] = True
-        self.update_network_ssid['defaultVlanId'] = self.wvlan_id
+            if self.tipo_auth == "8021x-meraki" :
+                self.update_network_ssid['radiusEnabled'] = True
+                self.update_network_ssid['radiusAttributeForGroupPolicies'] = self.radius_attribute
+                self.update_network_ssid['authMode'] = self.tipo_auth
+                self.update_network_ssid['encryptionMode'] = "wpa"
+                self.update_network_ssid['wpaEncryptionMode'] = "WPA2 only"
+            else :
+                radius_server={}
+                radius_server["host"] = self.serv_radius
+                radius_server["port"] = self.port_radius
+                radius_server["secret"] = "null"
+                self.update_network_ssid['authMode'] = self.tipo_auth
+                self.update_network_ssid['encryptionMode'] = "wpa"
+                self.update_network_ssid['wpaEncryptionMode'] = "WPA2 only"
+                self.update_network_ssid['radiusServers'] = [radius_server]
+                self.update_network_ssid['radiusEnabled'] = True
+                self.update_network_ssid['radiusAttributeForGroupPolicies'] = self.radius_attribute
+        if self.mode_assigmentip == "NAT mode" or self.mode_assigmentip == "VPN":
+            self.update_network_ssid['ipAssignmentMode'] = self.mode_assigmentip
+        else :
+            self.update_network_ssid['useVlanTagging'] = True
+            self.update_network_ssid['defaultVlanId'] = self.wvlan_id
+            self.update_network_ssid['lanIsolationEnabled'] = False
         self.update_network_ssid['minBitrate'] = 11
         self.update_network_ssid['bandSelection'] = self.band_selection
         self.update_network_ssid['perClientBandwidthLimitUp'] = self.client_limitup
         self.update_network_ssid['perClientBandwidthLimitDown'] = self.client_limitdown
         self.update_network_ssid['availableOnAllAps'] = self.allow_ap
         self.update_network_ssid['visible'] = True
-        self.update_network_ssid['lanIsolationEnabled'] = False
         self.update_network_ssid['splashPage'] = SplashPageEnum.ENUM_NONE
         print(self.update_network_ssid)
         collect = {}
@@ -729,7 +731,7 @@ class botCisco():
                 self.OPCION_MENU_WIFI: [MessageHandler(Filters.regex('^(1)$'), self.ssids_activas),
                                         MessageHandler(Filters.regex('^(2)$'), self.ssids_conf)],
                 self.volver_menu_wifi: [MessageHandler(Filters.regex('^(1)$'), self.menu_WIFI),
-                                        MessageHandler(Filters.regex('^(2)$'), self.start)],
+                                        MessageHandler(Filters.regex('^(2)$'), self.inicio1)],
                 self.id_wifi: [MessageHandler(Filters.text, self.confirmar_wifi)],
                 self.confirmacion: [MessageHandler(Filters.regex('^(SI)$'), self.conf_nombre_wifi),
                                     MessageHandler(Filters.regex('^(NO)$'), self.ssids_conf)],
