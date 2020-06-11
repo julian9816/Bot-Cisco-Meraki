@@ -12,7 +12,7 @@ update_network_ssid = {"name": "Prueba", "enabled": False, "authMode": "8021x-ra
                         "radiusEnabled": True, "ipAssignmentMode": "Bridge mode",
                         "useVlanTagging": True, "defaultVlanId": 123, "minBitrate": 11, "bandSelection": "5 GHz band only",
                         "perClientBandwidthLimitUp": 0, "perClientBandwidthLimitDown": 0, "availableOnAllAps": True, "visible": True,
-                        "lanIsolationEnabled": False, "splashPage": "None"}
+                        "lanIsolationEnabled": False, "splashPage": "None", "radiusAttributeForGroupPolicies": "Reply-Message"}
 radiusServers={"host": "192.168.1.1", "port": "3000", "secret":"null"}
 update_network_ssid["radiusServers"] = [radiusServers]
 collect = {}

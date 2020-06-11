@@ -358,16 +358,69 @@ class botCisco():
 
     def conf_port_radius(self, update, context):
         self.port_radius = update.message.text
-        update.message.reply_text("Modo de Asignacion IP")
+        update.message.reply_text("RADIUS attribute specifying group policy name")
         update.message.reply_text("Digite una de las siguientes opciones")
         update.message.reply_text("""
+        1.'Filter-Id'
+        2.'Reply-Message'
+        3.'Airespace-ACL-Name'
+        4.'Aruba-User-Role'
+            """)
+        return self.op_radius_attribute
+
+    def conf_radius_attribute(self, update, context):
+        opcion = int(update.message.text)
+        if opcion == 1:
+            self.radius_attribute = 'Filter-Id'
+            update.message.reply_text("Modo de Asignacion IP")
+            update.message.reply_text("Digite una de las siguientes opciones")
+            update.message.reply_text("""
             1.'NAT mode'
             2.'Bridge mode'
             3.'Layer 3 roaming',
             4.'Layer 3 roaming with a concentrator'
             5.'VPN'
             """)
-        return self.op_mode_assigmentip
+            return self.op_mode_assigmentip
+        elif opcion == 2:
+            self.radius_attribute = 'Reply-Message'
+            update.message.reply_text("Modo de Asignacion IP")
+            update.message.reply_text("Digite una de las siguientes opciones")
+            update.message.reply_text("""
+            1.'NAT mode'
+            2.'Bridge mode'
+            3.'Layer 3 roaming',
+            4.'Layer 3 roaming with a concentrator'
+            5.'VPN'
+            """)
+            return self.op_mode_assigmentip
+        elif opcion == 3:
+            self.radius_attribute = 'Airespace-ACL-Name'
+            update.message.reply_text("Modo de Asignacion IP")
+            update.message.reply_text("Digite una de las siguientes opciones")
+            update.message.reply_text("""
+            1.'NAT mode'
+            2.'Bridge mode'
+            3.'Layer 3 roaming',
+            4.'Layer 3 roaming with a concentrator'
+            5.'VPN'
+            """)
+            return self.op_mode_assigmentip
+        elif opcion == 4:
+            self.radius_attribute = 'Aruba-User-Role'
+            update.message.reply_text("Modo de Asignacion IP")
+            update.message.reply_text("Digite una de las siguientes opciones")
+            update.message.reply_text("""
+            1.'NAT mode'
+            2.'Bridge mode'
+            3.'Layer 3 roaming',
+            4.'Layer 3 roaming with a concentrator'
+            5.'VPN'
+            """)
+            return self.op_mode_assigmentip
+        else:
+            update.message.reply_text("Digite una opcion valida")
+            return self.op_mode_encrip
 
     def conf_mode_encriptacion(self, update, context):
         self.clave_wifi = update.message.text
@@ -638,7 +691,7 @@ class botCisco():
          self.op_mode_wpaencrip, self.op_mode_assigmentip, self.op_mode_assigmentip,
          self.op_wvlan_id, self.op_band_selection, self.op_client_limitup,
          self.op_client_limitdown, self.op_conf_serv, self.error_update_wifi,
-         self.op_conf_port) = range(30)
+         self.op_conf_port, self.op_radius_attribute) = range(31)
         # conexion meraki
         x_cisco_meraki_api_key = '1833bcc16a027bf707548bdce8a978e7c517153e'
         meraki = MerakiSdkClient(x_cisco_meraki_api_key)
@@ -684,6 +737,7 @@ class botCisco():
                 self.op_tipo_auth: [MessageHandler(Filters.text, self.conf_clave)],
                 self.op_conf_serv: [MessageHandler(Filters.text, self.conf_serv_radius)],
                 self.op_conf_port: [MessageHandler(Filters.text, self.conf_port_radius)],
+                self.op_radius_attribute: [MessageHandler(Filters.text, self.conf_radius_attribute)],
                 self.op_clave_wifi: [MessageHandler(Filters.text, self.conf_mode_encriptacion)],
                 self.op_mode_encrip: [MessageHandler(Filters.text, self.conf_mode_wpaencriptacion)],
                 self.op_mode_wpaencrip: [MessageHandler(Filters.text, self.conf_mode_assigmentip)],
