@@ -314,27 +314,60 @@ class botCisco():
         elif self.tipo_auth == 3:
             self.tipo_auth = auth_mode_enum.AuthModeEnum.OPENWITHRADIUS
             update.message.reply_text("Open with radius") ##Corregir-revisar servidor
-            update.message.reply_text("Digite la clave para la red WIFI")
+            update.message.reply_text("Digite la direccion ip del servidor")
+            return self.op_conf_serv
         elif self.tipo_auth == 4:
             self.tipo_auth = auth_mode_enum.AuthModeEnum.ENUM_8021XMERAKI
             update.message.reply_text('8021x-meraki') ##Corregir-revisar servidor
-            update.message.reply_text("Digite la clave para la red WIFI")
+            self.mode_encrip = "wpa-eap"
+            update.message.reply_text("Modo de Asignacion IP")
+            update.message.reply_text("Digite una de las siguientes opciones")
+            update.message.reply_text("""
+                1.'NAT mode'
+                2.'Bridge mode'
+                3.'Layer 3 roaming',
+                4.'Layer 3 roaming with a concentrator'
+                5.'VPN'
+                """)
+            return self.op_mode_assigmentip
         elif self.tipo_auth == 5:
             self.tipo_auth = auth_mode_enum.AuthModeEnum.ENUM_8021XRADIUS
             update.message.reply_text('8021x-radius') ##Corregir-revisar servidor
-            update.message.reply_text("Digite la clave para la red WIFI")
+            update.message.reply_text("Digite la direccion ip del servidor")
+            return self.op_conf_serv
         elif self.tipo_auth == 6:
             self.tipo_auth = auth_mode_enum.AuthModeEnum.IPSKWITHRADIUS
             update.message.reply_text('ipsk-with-radius') ##Corregir-revisar servidor
-            update.message.reply_text("Digite la clave para la red WIFI")
+            update.message.reply_text("Digite la direccion ip del servidor")
+            return self.op_conf_serv
         elif self.tipo_auth == 7:
             self.tipo_auth = auth_mode_enum.AuthModeEnum.IPSKWITHOUTRADIUS
             update.message.reply_text('ipsk-without-radius') ##Corregir-revisar servidor
-            update.message.reply_text("Digite la clave para la red WIFI")
+            update.message.reply_text("Digite la direccion ip del servidor")
+            return self.op_conf_serv
         else:
             update.message.reply_text("Digite una opcion valida")
             return self.op_tipo_auth
         return self.op_clave_wifi
+
+    def conf_serv_radius(self, update, context):
+        self.mode_encrip = "wpa-eap"
+        update.message.reply_text("Digite el puerto del servidor")
+        self.serv_radius = update.message.text
+        return self.op_conf_port
+
+    def conf_port_radius(self, update, context):
+        self.port_radius = update.message.text
+        update.message.reply_text("Modo de Asignacion IP")
+        update.message.reply_text("Digite una de las siguientes opciones")
+        update.message.reply_text("""
+            1.'NAT mode'
+            2.'Bridge mode'
+            3.'Layer 3 roaming',
+            4.'Layer 3 roaming with a concentrator'
+            5.'VPN'
+            """)
+        return self.op_mode_assigmentip
 
     def conf_mode_encriptacion(self, update, context):
         self.clave_wifi = update.message.text
@@ -517,7 +550,7 @@ class botCisco():
         self.client_limitdown = int(update.message.text)
         self.allow_ap = True
         self.update_network_ssid['name'] = self.nombre_wifi
-        self.update_network_ssid['enabled'] = True
+        self.update_network_ssid['enabled'] = False
         if self.tipo_auth == "open":
             self.update_network_ssid['authMode'] = self.tipo_auth
         elif self.mode_encrip == "wpa":
@@ -525,10 +558,20 @@ class botCisco():
             self.update_network_ssid['psk'] = self.clave_wifi
             self.update_network_ssid['encryptionMode'] = self.mode_encrip
             self.update_network_ssid['wpaEncryptionMode'] = self.mode_wpaencrip
-        else:
+        elif self.mode_encrip == "web":
             self.update_network_ssid['authMode'] = self.tipo_auth
-            self.update_network_ssid['psk'] = self.clave_wifi
             self.update_network_ssid['encryptionMode'] = self.mode_encrip
+        else:
+            radius_server={}
+            radius_server["host"] = self.serv_radius
+            radius_server["port"] = self.port_radius
+            radius_server["secret"] = "null"
+            self.update_network_ssid['authMode'] = self.tipo_auth
+            self.update_network_ssid['encryptionMode'] = "wpa"
+            self.update_network_ssid['wpaEncryptionMode'] = "WPA2 only"
+            self.update_network_ssid['radiusServers'] = [radius_server]
+            self.update_network_ssid['radiusEnabled'] = True
+            self.update_network_ssid['radiusAttributeForGroupPolicies'] = "Filter-Id"
         self.update_network_ssid['ipAssignmentMode'] = self.mode_assigmentip
         self.update_network_ssid['useVlanTagging'] = True
         self.update_network_ssid['defaultVlanId'] = self.wvlan_id
@@ -540,6 +583,7 @@ class botCisco():
         self.update_network_ssid['visible'] = True
         self.update_network_ssid['lanIsolationEnabled'] = False
         self.update_network_ssid['splashPage'] = SplashPageEnum.ENUM_NONE
+        print(self.update_network_ssid)
         collect = {}
         number = self.number_ssid
         collect['network_id'] = self.networkid
@@ -593,7 +637,8 @@ class botCisco():
          self.intentos_agotados, self.op_clave_wifi, self.op_mode_encrip,
          self.op_mode_wpaencrip, self.op_mode_assigmentip, self.op_mode_assigmentip,
          self.op_wvlan_id, self.op_band_selection, self.op_client_limitup,
-         self.op_client_limitdown, self.op_allow_ap, self.error_update_wifi) = range(29)
+         self.op_client_limitdown, self.op_conf_serv, self.error_update_wifi,
+         self.op_conf_port) = range(30)
         # conexion meraki
         x_cisco_meraki_api_key = '1833bcc16a027bf707548bdce8a978e7c517153e'
         meraki = MerakiSdkClient(x_cisco_meraki_api_key)
@@ -625,7 +670,9 @@ class botCisco():
                 self.CREARVLAN: [MessageHandler(Filters.regex('^(Si|No)$'), self.crearVlan)],
                 self.START: [MessageHandler(Filters.regex('^(Si)$'), self.start)],
                 self.ELIMINARVLAN: [MessageHandler(Filters.text, self.eliminarVlan)],
+
                 # Administrar Redes WIFI
+
                 self.OPCION_MENU_WIFI: [MessageHandler(Filters.regex('^(1)$'), self.ssids_activas),
                                         MessageHandler(Filters.regex('^(2)$'), self.ssids_conf)],
                 self.volver_menu_wifi: [MessageHandler(Filters.regex('^(1)$'), self.menu_WIFI),
@@ -635,6 +682,8 @@ class botCisco():
                                     MessageHandler(Filters.regex('^(NO)$'), self.ssids_conf)],
                 self.op_nombre_wifi: [MessageHandler(Filters.text, self.conf_auth)],
                 self.op_tipo_auth: [MessageHandler(Filters.text, self.conf_clave)],
+                self.op_conf_serv: [MessageHandler(Filters.text, self.conf_serv_radius)],
+                self.op_conf_port: [MessageHandler(Filters.text, self.conf_port_radius)],
                 self.op_clave_wifi: [MessageHandler(Filters.text, self.conf_mode_encriptacion)],
                 self.op_mode_encrip: [MessageHandler(Filters.text, self.conf_mode_wpaencriptacion)],
                 self.op_mode_wpaencrip: [MessageHandler(Filters.text, self.conf_mode_assigmentip)],
@@ -643,7 +692,6 @@ class botCisco():
                 self.op_band_selection: [MessageHandler(Filters.text, self.conf_client_limitup)],
                 self.op_client_limitup: [MessageHandler(Filters.text, self.conf_client_limitdown)],
                 self.op_client_limitdown: [MessageHandler(Filters.text, self.conf_wifi)],
-                # self.op_allow_ap:[MessageHandler(Filters.text, self.conf_wifi)],
                 self.error_update_wifi: [MessageHandler(Filters.regex('^(1)$'), self.confirmar_wifi),
                                          MessageHandler(Filters.regex('^(2)$'), self.menu_WIFI)]
             },

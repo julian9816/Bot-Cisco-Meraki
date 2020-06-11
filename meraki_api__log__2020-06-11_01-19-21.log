@@ -1,0 +1,7 @@
+2020-06-11 01:19:21       meraki:     INFO > Meraki dashboard API session initialized with these parameters: {'self': <meraki.rest_session.RestSession object at 0x0000022FDEACC848>, 'logger': <Logger meraki (DEBUG)>, 'api_key': '************************************153e', 'base_url': 'https://api.meraki.com/api/v0', 'single_request_timeout': 60, 'certificate_path': '', 'requests_proxy': '', 'wait_on_rate_limit': True, 'nginx_429_retry_wait_time': 60, 'action_batch_retry_wait_time': 60, 'retry_4xx_error': False, 'retry_4xx_error_wait_time': 60, 'maximum_retries': 2, 'simulate': False, 'be_geo_id': None, 'caller': None, '__class__': <class 'meraki.rest_session.RestSession'>}
+2020-06-11 01:19:21       meraki:    DEBUG > {'tags': ['SSIDs'], 'operation': 'updateNetworkSsid', 'method': 'PUT', 'url': '/networks/L_635570497412679705/ssids/6', 'json': {'name': 'My SSID', 'enabled': True}}
+2020-06-11 01:19:21 urllib3.connectionpool:    DEBUG > Starting new HTTPS connection (1): api.meraki.com:443
+2020-06-11 01:19:22 urllib3.connectionpool:    DEBUG > https://api.meraki.com:443 "PUT /api/v0/networks/L_635570497412679705/ssids/6 HTTP/1.1" 308 None
+2020-06-11 01:19:22 urllib3.connectionpool:    DEBUG > Starting new HTTPS connection (1): n129.meraki.com:443
+2020-06-11 01:19:23 urllib3.connectionpool:    DEBUG > https://n129.meraki.com:443 "PUT /api/v0/networks/L_635570497412679705/ssids/6 HTTP/1.1" 200 None
+2020-06-11 01:19:23       meraki:     INFO > SSIDs, updateNetworkSsid - 200 OK
