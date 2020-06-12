@@ -595,18 +595,22 @@ class botCisco():
     def conf_wifi(self, update, context):
         self.client_limitdown = int(update.message.text)
         self.allow_ap = True
+        self.update_network_ssid = {}
         self.update_network_ssid['name'] = self.nombre_wifi
-        self.update_network_ssid['enabled'] = False
+        self.update_network_ssid['enabled'] = True
         if self.tipo_auth == "open":
             self.update_network_ssid['authMode'] = self.tipo_auth
+
         elif self.mode_encrip == "wpa":
             self.update_network_ssid['authMode'] = self.tipo_auth
             self.update_network_ssid['psk'] = self.clave_wifi
             self.update_network_ssid['encryptionMode'] = self.mode_encrip
             self.update_network_ssid['wpaEncryptionMode'] = self.mode_wpaencrip
+
         elif self.mode_encrip == "web":
             self.update_network_ssid['authMode'] = self.tipo_auth
             self.update_network_ssid['encryptionMode'] = self.mode_encrip
+
         else:
             if self.tipo_auth == "8021x-meraki" :
                 self.update_network_ssid['radiusEnabled'] = True
@@ -614,6 +618,7 @@ class botCisco():
                 self.update_network_ssid['authMode'] = self.tipo_auth
                 self.update_network_ssid['encryptionMode'] = "wpa"
                 self.update_network_ssid['wpaEncryptionMode'] = "WPA2 only"
+
             else :
                 radius_server={}
                 radius_server["host"] = self.serv_radius
@@ -649,6 +654,7 @@ class botCisco():
             update.message.reply_text("La Red se ha configurado con exito")
             update.message.reply_text("""1. Para volver al menu de redes WIFI
             2. Para volver al menu principal""")
+            del self.update_network_ssid
             return self.volver_menu_wifi
         except APIException as e:
             print(e)
@@ -656,6 +662,7 @@ class botCisco():
             Ha ocurrido un error por favor digite las siguientes opciones
             1. Para volver a configurar la red wifi
             2. Para volver al menu wifi""")
+            del self.update_network_ssid
             return self.error_update_wifi
 
     # Funciones para cancelar y cerrar la conversacion
@@ -701,7 +708,6 @@ class botCisco():
         self.networkid = 'L_635570497412679705'
         self.vlans_controller = meraki.vlans
         self.ssid_controller = meraki.ssids
-        self.update_network_ssid = {}
         # Menu
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start)],
