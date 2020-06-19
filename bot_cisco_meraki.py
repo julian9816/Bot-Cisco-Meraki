@@ -55,7 +55,8 @@ class botCisco():
             return self.verificacion
         else:
             return ConversationHandler.END
-        # Verificacion
+
+    # Verificacion
 
     def enviarCorreo(self, correo):
         msg = MIMEMultipart()
@@ -77,12 +78,18 @@ class botCisco():
     def inicio1(self, update, context):
         if int(update.message.text) == self.seg_code:
             self.num_intentos = 0
+            self.organizations=self.meraki.organizations.get_organizations()
+            org_text = 'Number'+'|'+'ID    '+'|'+'NAME  '+'|'+'\n'
+            i=1
+            for x in self.organizations:
+                org_text = org_text + \
+                    str(i)+'      |'+format(x["id"])+'|'+format(x["name"]) + '\n'
+                x["number"]=i
+                i+=1
+            print(self.organizations)
+            update.message.reply_text(org_text)
             update.message.reply_text("""
-            Bot Cisco Meraki
-            Opciones:
-            1. Administrar VLANS
-            2. Administrar Redes WIFI
-            3. Salir
+            Digite el numero de la organizacion.
             """)
         else:
             if self.num_intentos == 3:
@@ -101,9 +108,42 @@ class botCisco():
                 update.message.reply_text(text)
                 self.num_intentos += 1
                 return self.verificacion
-        return self.OPCION
+        return self.op_sel_org
     # Funciones MENUS
-
+    def sel_network(self, update, context):
+        self.organizacion=int(update.message.text)
+        for x in self.organizations:
+            if x["number"]==self.organizacion:
+                self.organizacion=x["id"]
+                break
+        controller=self.meraki.networks
+        self.networks=controller.get_organization_networks({"organization_id":self.organizacion})
+        net_text = 'Number'+'|'+'ID    '+'|'+'NAME  '+'|'+'\n'
+        i=1
+        for x in self.networks:
+            net_text = net_text + \
+                str(i)+'      |'+format(x["id"])+'|'+format(x["name"]) + '\n'
+            x["number"]=i
+            i+=1
+        update.message.reply_text(net_text)
+        update.message.reply_text("""
+            Digite el numero de la red
+            """)
+        return self.op_sel_net
+    def menu(self, update, context):
+        for x in self.networks:
+            if x["number"]==int(update.message.text):
+                self.networkid=x["id"]
+                break
+        print(self.networkid)
+        update.message.reply_text("""
+            Bot Cisco Meraki
+            Opciones:
+            1. Administrar VLANS
+            2. Administrar Redes WIFI
+            3. Salir
+            """)
+        return self.OPCION
     def menu_vlan(self, update, context):
         update.message.reply_text("Menu VLANS"
                                   'Opciones''\n'
@@ -700,14 +740,14 @@ class botCisco():
          self.op_mode_wpaencrip, self.op_mode_assigmentip, self.op_mode_assigmentip,
          self.op_wvlan_id, self.op_band_selection, self.op_client_limitup,
          self.op_client_limitdown, self.op_conf_serv, self.error_update_wifi,
-         self.op_conf_port, self.op_radius_attribute) = range(31)
+         self.op_conf_port, self.op_radius_attribute, self.op_sel_org,
+         self.op_sel_net) = range(33)
         # conexion meraki
         x_cisco_meraki_api_key = '1833bcc16a027bf707548bdce8a978e7c517153e'
-        meraki = MerakiSdkClient(x_cisco_meraki_api_key)
+        self.meraki = MerakiSdkClient(x_cisco_meraki_api_key)
         # controladores
-        self.networkid = 'L_635570497412679705'
-        self.vlans_controller = meraki.vlans
-        self.ssid_controller = meraki.ssids
+        self.vlans_controller = self.meraki.vlans
+        self.ssid_controller = self.meraki.ssids
         # Menu
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start)],
@@ -716,6 +756,9 @@ class botCisco():
                 # Verificacion
                 self.verificacion: [MessageHandler(Filters.text, self.inicio1)],
                 self.intentos_agotados: [MessageHandler(Filters.text, self.start)],
+                # Seleccion network y organizacion
+                self.op_sel_org: [MessageHandler(Filters.text, self.sel_network)],
+                self.op_sel_net: [MessageHandler(Filters.text, self.menu)],
                 # Menu principal
                 self.OPCION: [MessageHandler(Filters.regex('^(1)$'), self.menu_vlan),
                               MessageHandler(Filters.regex( '^(2)$'), self.menu_WIFI),
