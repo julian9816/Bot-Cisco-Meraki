@@ -658,7 +658,6 @@ class botCisco():
                 self.update_network_ssid['authMode'] = self.tipo_auth
                 self.update_network_ssid['encryptionMode'] = "wpa"
                 self.update_network_ssid['wpaEncryptionMode'] = "WPA2 only"
-
             else :
                 radius_server={}
                 radius_server["host"] = self.serv_radius
@@ -673,6 +672,7 @@ class botCisco():
         if self.mode_assigmentip == "NAT mode" or self.mode_assigmentip == "VPN":
             self.update_network_ssid['ipAssignmentMode'] = self.mode_assigmentip
         else :
+            self.update_network_ssid['ipAssignmentMode'] = self.mode_assigmentip
             self.update_network_ssid['useVlanTagging'] = True
             self.update_network_ssid['defaultVlanId'] = self.wvlan_id
             self.update_network_ssid['lanIsolationEnabled'] = False
