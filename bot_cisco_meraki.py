@@ -229,7 +229,8 @@ class botCisco():
                                   'Direccion Subnet: '+str(self.subnetDir)+'\n'
                                   'Direccion GateWay: ' +
                                   str(self.gatewayDir)+'\n'
-                                  'Para confirmar los valores por favor digite Si'
+                                  'Para confirmar los valores por favor digite Si'+'\n'
+                                  'Para cambiar los valores por favor digite No'
                                   )
         return self.CREARVLAN
 
@@ -766,21 +767,25 @@ class botCisco():
                 # ADMINISTRAR VLANS
                 self.OPCION_MENU_VLAN: [MessageHandler(Filters.regex('^(1)$'), self.recoleccionDatosVlan),
                                         MessageHandler(Filters.regex('^(2)$'), self.verVlans),
-                                        MessageHandler(Filters.regex('^(3)$'), self.recoleccionDatosEliminarVlan)],
+                                        MessageHandler(Filters.regex('^(3)$'), self.recoleccionDatosEliminarVlan),
+                                        MessageHandler(Filters.regex('^(4)$'), self.menu)],
                 self.DATOS: [MessageHandler(Filters.text, self.subnet)],
                 self.GATEWAY: [MessageHandler(Filters.text, self.gateway)],
                 self.VLANAME: [MessageHandler(Filters.text, self.vlaname)],
                 self.VLANID: [MessageHandler(Filters.text, self.vlanid_func)],
-                self.CREARVLAN: [MessageHandler(Filters.regex('^(Si|No)$'), self.crearVlan)],
-                self.START: [MessageHandler(Filters.regex('^(Si)$'), self.start)],
+                self.CREARVLAN: [MessageHandler(Filters.regex('^(Si)$'), self.crearVlan),
+                                 MessageHandler(Filters.regex('^(No)$'), self.recoleccionDatosVlan)],
+                self.START: [MessageHandler(Filters.regex('^(Si)$'), self.menu_vlan)],
+
                 self.ELIMINARVLAN: [MessageHandler(Filters.text, self.eliminarVlan)],
 
                 # Administrar Redes WIFI
 
                 self.OPCION_MENU_WIFI: [MessageHandler(Filters.regex('^(1)$'), self.ssids_activas),
-                                        MessageHandler(Filters.regex('^(2)$'), self.ssids_conf)],
+                                        MessageHandler(Filters.regex('^(2)$'), self.ssids_conf),
+                                        MessageHandler(Filters.regex('^(4)$'), self.menu)],
                 self.volver_menu_wifi: [MessageHandler(Filters.regex('^(1)$'), self.menu_WIFI),
-                                        MessageHandler(Filters.regex('^(2)$'), self.inicio1)],
+                                        MessageHandler(Filters.regex('^(2)$'), self.menu)],
                 self.id_wifi: [MessageHandler(Filters.text, self.confirmar_wifi)],
                 self.confirmacion: [MessageHandler(Filters.regex('^(SI)$'), self.conf_nombre_wifi),
                                     MessageHandler(Filters.regex('^(NO)$'), self.ssids_conf)],
