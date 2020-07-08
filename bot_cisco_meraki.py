@@ -130,12 +130,39 @@ class botCisco():
             Digite el numero de la red
             """)
         return self.op_sel_net
+    # Menu Principal
     def menu(self, update, context):
         for x in self.networks:
             if x["number"]==int(update.message.text):
                 self.networkid=x["id"]
                 break
         print(self.networkid)
+        update.message.reply_text("""
+            Bot Cisco Meraki
+            Opciones:
+            1. Administrar Redes
+            2. Monitoreo
+            """)
+        return self.op_menu
+    # Menu monitoreo
+    def menu_monit(self, update, context):
+        update.message.reply_text("""
+            Bot Cisco Meraki
+            Opciones:
+            1. Monitoreo trafico clientes
+            2. Monitoreo Location Analytics
+            """)
+        return self.op_monitoreo
+    def monitor_client(self, update, context):
+        collect = {}
+        collect["network_id"] = self.networkid
+        try:
+            self.clients_controller.get_network_clients(collect)
+        except APIException as e:
+            print(e)
+        return self.nose
+    # Menu configuracion
+    def menu_conf(self, update, context):
         update.message.reply_text("""
             Bot Cisco Meraki
             Opciones:
@@ -742,13 +769,14 @@ class botCisco():
          self.op_wvlan_id, self.op_band_selection, self.op_client_limitup,
          self.op_client_limitdown, self.op_conf_serv, self.error_update_wifi,
          self.op_conf_port, self.op_radius_attribute, self.op_sel_org,
-         self.op_sel_net) = range(33)
+         self.op_sel_net, self.op_menu, self.op_monitoreo) = range(35)
         # conexion meraki
         x_cisco_meraki_api_key = '1833bcc16a027bf707548bdce8a978e7c517153e'
         self.meraki = MerakiSdkClient(x_cisco_meraki_api_key)
         # controladores
         self.vlans_controller = self.meraki.vlans
         self.ssid_controller = self.meraki.ssids
+        self.clients_controller = self.meraki.clients
         # Menu
         conv_handler = ConversationHandler(
             entry_points=[CommandHandler('start', self.start)],
@@ -761,6 +789,12 @@ class botCisco():
                 self.op_sel_org: [MessageHandler(Filters.text, self.sel_network)],
                 self.op_sel_net: [MessageHandler(Filters.text, self.menu)],
                 # Menu principal
+                self.op_menu: [MessageHandler(Filters.regex('^(1)$'), self.menu_conf),
+                               MessageHandler(Filters.regex('^(1)$'), self.menu_monit)],
+                # Menu Monitoreo
+                self.op_monitoreo: [MessageHandler(Filters.regex('^(1)$'), self.monitor_client),
+                                    MessageHandler(Filters.regex('^(1)$'), self.location_analytics)],
+                # Menu Configuracion
                 self.OPCION: [MessageHandler(Filters.regex('^(1)$'), self.menu_vlan),
                               MessageHandler(Filters.regex( '^(2)$'), self.menu_WIFI),
                               MessageHandler(Filters.regex('^(3)$'), self.cancel)],

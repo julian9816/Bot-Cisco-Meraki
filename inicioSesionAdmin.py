@@ -11,10 +11,9 @@ import os
 import shutil
 import glob
 from datetime import datetime
-import openpyxl 
+import openpyxl
 import smtplib
 import email
-import openpyxl
 import smtplib
 import email
 from email.mime.multipart import MIMEMultipart
@@ -130,10 +129,10 @@ class inicioSesionAdmin(unittest.TestCase):
             descarga=driver.find_elements_by_xpath('/html/body/table/tbody/tr[2]/td/table/tbody/tr[1]/td[1]/table/tbody/tr/td/form/table[1]/tbody/tr[2]/td[2]/input[2]')[0].click()
             time.sleep(2)
             filepath = 'E:\ARUS S.A\Proyectos\Python\Webex\Chrome_Driver\Chrome_Driver\Archivos\Archivos'
-            
+
             filename = max([f for f in os.listdir(filepath)], key=lambda xa : os.path.getctime(os.path.join(filepath,xa)))
             newname=correo+' '+nombre_clase+'.csv'
- 
+
             if '.part' in filename:
                 time.sleep(2)
                 os.rename(os.path.join(filepath, filename), os.path.join(filepath, newname))
@@ -234,7 +233,7 @@ class inicioSesionAdmin(unittest.TestCase):
         self.correos=list(set(correos))
         self.ajustarTamaño(filesheet)
         self.ajustarTamaño(informeGeneral)
-    
+
     def ajustarTamaño(self, filesheet):
         wb=openpyxl.load_workbook(filesheet)
         for n in wb.get_sheet_names():
@@ -251,12 +250,12 @@ class inicioSesionAdmin(unittest.TestCase):
        if value is None:
            return ""
        return str(value)
-       
+
     def tearDown(self):
         self.driver.close()
 
     def enviarCorreo(self, correo):
-        msg = MIMEMultipart() 
+        msg = MIMEMultipart()
         message = "Reporte Cisco Webex Training"
         password = "G849JNN43"
         msg['From'] = "csjulian@unicauca.edu.co"
