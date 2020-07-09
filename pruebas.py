@@ -3,6 +3,7 @@ from meraki_sdk.meraki_sdk_client import MerakiSdkClient
 from meraki_sdk.exceptions.api_exception import APIException
 import openpyxl
 from openpyxl.styles import Alignment
+from openpyxl.styles import Font
 
 x_cisco_meraki_api_key = "1833bcc16a027bf707548bdce8a978e7c517153e"
 meraki = MerakiSdkClient(x_cisco_meraki_api_key)
@@ -20,8 +21,6 @@ ssid_controller = meraki.clients
 #  "ipAssignmentMode" : "Bridge mode"}
 collect = {}
 collect["network_id"] = networkid
-# collect["number"] = 6
-# collect["update_network_ssid"] = update_network_ssid
 def as_text(value):
        if value is None:
            return ""
@@ -42,7 +41,7 @@ try:
     wb = openpyxl.Workbook()
     wb.create_sheet(index=0, title="Clientes")
     hoja = wb['Clientes']
-    descripciones=['Description', 'Visto por primera vez', 'Group Policy 8021x',
+    descripciones=['Descripcion', 'Visto por primera vez', 'Group Policy 8021x',
         'ID', 'Direccion Ip', 'ip6', 'Direccion Ip V6 Local', 'Visto por ultima vez', 'Direccion MAC', 'Fabricante',
         'notes', 'Sistema Operativo', 'MAC Dispositivo de la Red', 'Dispositivo de la Red', 'Serial Dispositivo de la Red',
         'smInstalled', 'SSID', 'Estado', 'Puerto del Switch', 'Datos recibidos (Mb)', 'Datos enviados (Mb)', 'Usuarios', 'VLAN']
@@ -77,7 +76,8 @@ try:
         else:
             wb.create_sheet(index=j, title=i["description"])
             hoja1=wb[i["description"]]
-        descripciones=['Segundos Activo', 'Aplicacion', 'Destino', 'numFlows', 'Puerto', 'Protocolo', 'Datos recibidos (KB)', 'Datos Enviados (KB)', 'ts']
+        descripciones=['Segundos Activo', 'Aplicacion', 'Destino', 'numFlows',
+                        'Puerto', 'Protocolo', 'Datos recibidos (KB)', 'Datos Enviados (KB)', 'ts']
         hoja1.append(descripciones)
         trafico=ssid_controller.get_network_client_traffic_history(collect)
         for i in trafico:
@@ -86,6 +86,15 @@ try:
                 valores.append(valor)
             hoja1.append(valores)
             hoja1.delete_cols(9)
+            for row in range(2,hoja1.max_row+1):
+                for column in "GH":  #Here you can add or reduce the columns
+                    cell_name = "{}{}".format(column, row)
+                    cell=hoja1[cell_name]# the value of the specific cell
+                    cell.number_format='#,##0'
+        for column in "ABCDEFGHIJKLMNOPQRSTUV":
+            cell_name = "{}{}".format(column, 1)
+            hoja[cell_name ].font = Font(bold=True)
+            hoja1[cell_name ].font = Font(bold=True)
         j+=1
     hoja.delete_cols(3)
     wb.save('clientes.xlsx')
