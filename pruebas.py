@@ -13,12 +13,6 @@ print(networks)
 # controladores
 networkid = "L_635570497412679705"
 ssid_controller = meraki.clients
-# update_network_ssid = {"name": "Prueba_radius", "enabled": True, "radiusEnabled": True,
-# "radiusAttributeForGroupPolicies": "Filter-Id", "authMode": "8021x-meraki", "encryptionMode": "wpa",
-# "wpaEncryptionMode": "WPA2 only", "useVlanTagging": True, "defaultVlanId": 123, "lanIsolationEnabled": False,
-# "minBitrate": 11, "bandSelection": "Dual band operation", "perClientBandwidthLimitUp": 0,
-#  "perClientBandwidthLimitDown": 0, "availableOnAllAps": True, "visible": True, "splashPage": "None",
-#  "ipAssignmentMode" : "Bridge mode"}
 collect = {}
 collect["network_id"] = networkid
 def as_text(value):
