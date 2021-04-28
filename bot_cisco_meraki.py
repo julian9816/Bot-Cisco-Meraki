@@ -47,7 +47,7 @@ class botCisco():
     def start(self, update, context):
         if update.message.text == "/start" or update.message.text == "1":
             self.seg_code = randint(1000, 9999)
-            enviado = self.enviarCorreo("csjulian@unicauca.edu.co")
+            enviado = self.enviarCorreo("xxx@uxxxo")
             if enviado:
                 update.message.reply_text(
                     "Se ha enviado un codigo de verificacion a su correo")
@@ -61,7 +61,7 @@ class botCisco():
     def enviarCorreo(self, correo):
         msg = MIMEMultipart()
         message = "Su codigo de seguridad es: "+str(self.seg_code)
-        password = "CISCO1234#"
+        password = "xxxx"
         msg['From'] = "botmerakitelegram@gmail.com"
         msg['To'] = correo
         msg['Subject'] = "Codigo de seguridad BOT Cisco Meraki"
@@ -755,7 +755,7 @@ class botCisco():
         # Post version 12 this will no longer be necessary
         self.num_intentos = 0
         updater = Updater(
-            "1018036620:AAEEdlklWQYxFm5MM8UDj9JF-VTAb2iKaFo", use_context=True)
+            "xxxx", use_context=True)
         # mibot = telegram.Bot("1018036620:AAEEdlklWQYxFm5MM8UDj9JF-VTAb2iKaFo")
         # Get the dispatcher to register handlers
         dp = updater.dispatcher
@@ -771,7 +771,7 @@ class botCisco():
          self.op_conf_port, self.op_radius_attribute, self.op_sel_org,
          self.op_sel_net, self.op_menu, self.op_monitoreo) = range(35)
         # conexion meraki
-        x_cisco_meraki_api_key = '1833bcc16a027bf707548bdce8a978e7c517153e'
+        x_cisco_meraki_api_key = 'xxx'
         self.meraki = MerakiSdkClient(x_cisco_meraki_api_key)
         # controladores
         self.vlans_controller = self.meraki.vlans
